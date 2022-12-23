@@ -8,6 +8,8 @@ type ThemeProp = {
 export enum themePalette {
   BG = "#FFFFFF",
   SILVER_PINK = "#d0b8ac",
+  LINEN = "#efe5dc",
+  CHAMPAGNE = "#f3d8c7",
   FONT_GLOBAL = "'JetBrains Mono', monospace",
 }
 
@@ -16,9 +18,6 @@ const theme = createTheme({
     mode: "dark",
     background: {
       default: themePalette.BG,
-    },
-    primary: {
-      main: themePalette.SILVER_PINK,
     },
   },
   typography: {
