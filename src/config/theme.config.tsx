@@ -7,10 +7,13 @@ type ThemeProp = {
 
 export enum themePalette {
   BG = "#FFFFFF",
-  SILVER_PINK = "#d0b8ac",
   LINEN = "#efe5dc",
   CHAMPAGNE = "#f3d8c7",
-  FONT_GLOBAL = "'JetBrains Mono', monospace",
+  BEAU_BLUE = "#CDE3F7",
+  CERULEAN = "#4059ad",
+  ALICE_BLUE = "#e9f0f7",
+  FONT_CURS = "'Handlee'",
+  FONT_GLOBAL = "'Rubik'",
 }
 
 const theme = createTheme({

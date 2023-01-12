@@ -1,59 +1,49 @@
-import { Grid } from "@mui/material";
-import { Container } from "@mui/system";
 import React from "react";
-import { dogList } from "../../api/dogList";
-import { BasicList } from "../../common/BasicList";
-import { DogListType } from "./types";
-import { byBreed } from "../../api/byBreed";
 import { ImageGallery } from "../../common/ImageGallery";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchCatalogue } from "../../redux/breeds/reducers";
+import { fetchImages } from "../../redux/breedsImages/reducers";
+import { getBreedImageList } from "../../redux/breedsImages/selectors";
+import { RootState } from "../../redux/store";
 
-export const HomePage: React.FC<{}> = () => {
-  const [allBreeds, setAllBreeds] = React.useState<DogListType>([]);
+const HomePage: React.FC<{}> = () => {
+  const { breedName: selectedBreed } = useParams<{
+    breedName: string;
+  }>();
 
-  const [selectedBreed, setSelectedBreed] = React.useState<string | null>(null);
+  const navigate = useNavigate();
 
-  const [imageGallery, setImageGallery] = React.useState<string[] | null>(null);
+  const imagesGallery = useSelector((state: RootState) =>
+    getBreedImageList(state, selectedBreed || "")
+  );
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
-    dogList
-      .getAll()
-      .then((r) => {
-        const response = Object.keys(
-          r.data && r.data.message ? r.data.message : []
-        );
-        setAllBreeds(response);
-        setSelectedBreed(response.length ? response[0] : null);
-      })
-      .catch((e) => {
-        console.error(e);
-      });
+    dispatch(fetchCatalogue());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
-    byBreed.getByBreed(selectedBreed || "").then((r) => {
-      const response = r.data.message;
-      setImageGallery(response);
-    });
-  }, [selectedBreed]);
+    if (selectedBreed) {
+      dispatch(fetchImages(selectedBreed));
+    }
+  }, [dispatch, selectedBreed]);
 
-const ChangeSelectedBreed = (name: string) => {
-  setSelectedBreed(name)
-  console.log(name)
-}
+  const viewSelectedImage = (imageUrl: string) => {
+    let splitUrl: string[] = imageUrl.split("/");
+    let breedName: string = splitUrl[4];
+    let imageId: string = splitUrl[5].split(".")[0];
+    navigate(`/breed/${breedName}/image/${imageId}`);
+  };
 
   return (
-    <Container sx={{ mt: 0 }} maxWidth="xl">
-      <Grid container>
-        <Grid item xs={2}>
-          <BasicList name="Dog API" list={allBreeds} selectBreed = {ChangeSelectedBreed}/>
-        </Grid>
-        <Grid item xs={10}>
-          <ImageGallery
-            name={selectedBreed || ""}
-            gallery={imageGallery || []}
-          />
-        </Grid>
-      </Grid>
-    </Container>
+    <ImageGallery
+      name={selectedBreed || ""}
+      gallery={imagesGallery || []}
+      fetchImage={viewSelectedImage}
+    />
   );
 };
+
+export { HomePage };
